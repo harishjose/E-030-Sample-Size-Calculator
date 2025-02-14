@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-030 Sample Size Calculator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>E-030 Sample Size Calculator</h1>
+
+  <!-- Question container -->
+  <div id="question-container">
+    <div id="question" class="question">Are you using Attribute (Qualitative) or Variable (Quantitative) data?</div>
+    <div id="options">
+      <button class="option-button" onclick="handleDataChoice('Qualitative')">Qualitative</button>
+      <button class="option-button" onclick="handleDataChoice('Quantitative')">Quantitative</button>
+    </div>
+  </div>
+
+  <!-- Risk container for Qualitative and Quantitative -->
+  <div id="risk-container" class="hidden">
+    <div id="risk-question" class="question">What is the risk profile for the characteristic you want to analyze?</div>
+    <div id="risk-options"></div>
+  </div>
+
+  <!-- Specification container for Quantitative -->
+  <div id="specification-container" class="hidden">
+    <div id="specification-question" class="question">Is it a One-Sided or Two-Sided specification?</div>
+    <div id="specification-options">
+      <button class="option-button" onclick="handleSpecification('One-Sided')">One-Sided</button>
+      <button class="option-button" onclick="handleSpecification('Two-Sided')">Two-Sided</button>
+    </div>
+  </div>
+
+  <!-- Quantitative Data Tables (Hidden initially) -->
+  <div id="quantitative-tables" class="hidden">
+    <h2>Quantitative Data Tables</h2>
+
+    <!-- Table for Low Risk, One-Sided -->
+    <div id="low-one-sided" class="hidden">
+      <h3>Table 1: Low Risk, One-Sided Specification Ppk Requirement</h3>
+	<h4><i>Zero rejects allowed.</i></h4>
+      <table>
+        <tr>
+          <th>Risk Category</th>
+          <th>Confidence Level</th>
+          <th>Reliability</th>
+          <th>Specification</th>
+          <th>Sample Size</th>
+          <th>Ppk Requirement</th>
+        </tr>
+        <tr>
+          <td>Low</td>
+          <td>90%</td>
+          <td>90%</td>
+          <td>One-sided</td>
+          <td>15</td>
+          <td>0.61</td>
+        </tr>
+        <tr>
+          <td>Low</td>
+          <td>90%</td>
+          <td>90%</td>
+          <td>One-sided</td>
+          <td>20</td>
+          <td>0.58</td>
+        </tr>
+        <tr>
+          <td>Low</td>
+          <td>90%</td>
+          <td>90%</td>
+          <td>One-sided</td>
+          <td>30</td>
+          <td>0.55</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Table for Medium Risk, One-Sided -->
+    <div id="medium-one-sided" class="hidden">
+      <h3>Table 2: Medium Risk, One-Sided Specification Ppk Requirement</h3>
+	<h4><i>Zero rejects allowed.</i></h4>
+      <table>
+        <tr>
+          <th>Risk Category</th>
+          <th>Confidence Level</th>
+          <th>Reliability</th>
+          <th>Specification</th>
+          <th>Sample Size</th>
+          <th>Ppk Requirement</th>
+        </tr>
+        <tr>
+          <td>Medium</td>
+          <td>95%</td>
+          <td>95%</td>
+          <td>One-sided</td>
+          <td>15</td>
+          <td>0.85</td>
+        </tr>
+        <tr>
+          <td>Medium</td>
+          <td>95%</td>
+          <td>95%</td>
+          <td>One-sided</td>
+          <td>20</td>
+          <td>0.79</td>
+        </tr>
+        <tr>
+          <td>Medium</td>
+          <td>95%</td>
+          <td>95%</td>
+          <td>One-sided</td>
+          <td>30</td>
+          <td>0.74</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Table for High Risk, One-Sided -->
+    <div id="high-one-sided" class="hidden">
+      <h3>Table 3: High Risk, One-Sided Specification Ppk Requirement</h3>
+	<h4><i>Zero rejects allowed.</i></h4>
+      <table>
+        <tr>
+          <th>Risk Category</th>
+          <th>Confidence Level</th>
+          <th>Reliability</th>
+          <th>Specification</th>
+          <th>Sample Size</th>
+          <th>Ppk Requirement</th>
+        </tr>
+        <tr>
+          <td>High</td>
+          <td>95%</td>
+          <td>99%</td>
+          <td>One-sided</td>
+          <td>15</td>
+          <td>1.16</td>
+        </tr>
+        <tr>
+          <td>High</td>
+          <td>95%</td>
+          <td>99%</td>
+          <td>One-sided</td>
+          <td>20</td>
+          <td>1.09</td>
+        </tr>
+        <tr>
+          <td>High</td>
+          <td>95%</td>
+          <td>99%</td>
+          <td>One-sided</td>
+          <td>30</td>
+          <td>1.02</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Table for Low Risk, Two-Sided -->
+    <div id="low-two-sided" class="hidden">
+      <h3>Table 4: Low Risk, Two-Sided Specification Ppk Requirement</h3>
+	<h4><i>Zero rejects allowed.</i></h4>
+      <table>
+        <tr>
+          <th>Risk Category</th>
+          <th>Confidence Level</th>
+          <th>Reliability</th>
+          <th>Specification</th>
+          <th>Sample Size</th>
+          <th>Ppk Requirement</th>
+        </tr>
+        <tr>
+          <td>Low</td>
+          <td>90%</td>
+          <td>90%</td>
+          <td>Two-sided</td>
+          <td>15</td>
+          <td>0.76</td>
+        </tr>
+        <tr>
+          <td>Low</td>
+          <td>90%</td>
+          <td>90%</td>
+          <td>Two-sided</td>
+          <td>20</td>
+          <td>0.72</td>
+        </tr>
+        <tr>
+          <td>Low</td>
+          <td>90%</td>
+          <td>90%</td>
+          <td>Two-sided</td>
+          <td>30</td>
+          <td>0.68</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Table for Medium Risk, Two-Sided -->
+    <div id="medium-two-sided" class="hidden">
+      <h3>Table 5: Medium Risk, Two-Sided Specification Ppk Requirement</h3>
+	<h4><i>Zero rejects allowed.</i></h4>
+      <table>
+        <tr>
+          <th>Risk Category</th>
+          <th>Confidence Level</th>
+          <th>Reliability</th>
+          <th>Specification</th>
+          <th>Sample Size</th>
+          <th>Ppk Requirement</th>
+        </tr>
+        <tr>
+          <td>Medium</td>
+          <td>95%</td>
+          <td>95%</td>
+          <td>Two-sided</td>
+          <td>15</td>
+          <td>0.98</td>
+        </tr>
+        <tr>
+          <td>Medium</td>
+          <td>95%</td>
+          <td>95%</td>
+          <td>Two-sided</td>
+          <td>20</td>
+          <td>0.92</td>
+        </tr>
+        <tr>
+          <td>Medium</td>
+          <td>95%</td>
+          <td>95%</td>
+          <td>Two-sided</td>
+          <td>30</td>
+          <td>0.85</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Table for High Risk, Two-Sided -->
+    <div id="high-two-sided" class="hidden">
+      <h3>Table 6: High Risk, Two-Sided Specification Ppk Requirement</h3>
+	<h4><i>Zero rejects allowed.</i></h4>
+      <table>
+        <tr>
+          <th>Risk Category</th>
+          <th>Confidence Level</th>
+          <th>Reliability</th>
+          <th>Specification</th>
+          <th>Sample Size</th>
+          <th>Ppk Requirement</th>
+        </tr>
+        <tr>
+          <td>High</td>
+          <td>95%</td>
+          <td>99%</td>
+          <td>Two-sided</td>
+          <td>15</td>
+          <td>1.42</td>
+        </tr>
+        <tr>
+          <td>High</td>
+          <td>95%</td>
+          <td>99%</td>
+          <td>Two-sided</td>
+          <td>20</td>
+          <td>1.31</td>
+        </tr>
+        <tr>
+          <td>High</td>
+          <td>95%</td>
+          <td>99%</td>
+          <td>Two-sided</td>
+          <td>30</td>
+          <td>1.23</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Result container for Qualitative Data (Hidden initially) -->
+  <div id="result-container" class="hidden"></div>
+
+  <script src="script.js"></script>
+<br><br><br><br><br>
+<button class="refresh-button" onclick="window.location.reload();">HOME</button>
+
+© Harish Jose 2025
+</body>
+</html>
