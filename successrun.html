@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success Run Calculator with OC Curve</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .input-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 250px;
+        }
+
+        .input-group label {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .input-field {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: 100%;
+        }
+
+        .calculate-button {
+            margin: 10px;
+            padding: 15px 30px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .calculate-button:hover {
+            background-color: #0056b3;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            color: green;
+        }
+
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .back-button:hover {
+            background-color: #45a049;
+        }
+
+        canvas {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Success Run Calculator with OC Curve</h1>
+
+    <div class="container">
+        <div class="input-container">
+            <div class="input-group">
+                <label for="confidence">Enter Confidence Level (as a decimal, e.g., 0.95 for 95%): </label>
+                <input type="number" id="confidence" class="input-field" step="0.01" min="0" max="1" placeholder="e.g. 0.95" required>
+            </div>
+
+            <div class="input-group">
+                <label for="reliability">Enter Reliability (as a decimal, e.g., 0.9 for 90%): </label>
+                <input type="number" id="reliability" class="input-field" step="0.01" min="0" max="1" placeholder="e.g. 0.9" required>
+            </div>
+        </div>
+
+        <button class="calculate-button" onclick="calculateSampleSize()">Calculate Sample Size</button>
+
+        <div id="result-container" class="result hidden"></div>
+
+        <canvas id="ocCurveCanvas" width="400" height="200"></canvas>
+
+        <button class="back-button" onclick="window.location.reload()">Reset</button>
+    </div>
+
+    <script>
+        // Function to calculate sample size using the original formula: n = ln(1 - confidence) / reliability
+        function calculateSampleSize() {
+            // Get user input for confidence level and reliability
+            const confidence = parseFloat(document.getElementById('confidence').value); // Confidence as a decimal
+            const reliability = parseFloat(document.getElementById('reliability').value); // Reliability as a decimal
+
+            // Validate inputs
+            if (isNaN(confidence) || isNaN(reliability) || confidence <= 0 || confidence >= 1 || reliability <= 0 || reliability >= 1) {
+                alert("Please enter valid values for confidence and reliability (e.g., 0.95 and 0.9).");
+                return;
+            }
+
+            // Ensure that the confidence is less than 1
+            if (confidence >= 1) {
+                alert("Confidence level should be a decimal less than 1 (e.g., 0.95).");
+                return;
+            }
+
+            // Calculate sample size using the formula
+            const sampleSize = Math.abs(Math.log(1 - confidence) / Math.log(reliability)); // Absolute value for positive output
+
+            // Display result
+            document.getElementById('result-container').classList.remove('hidden');
+            document.getElementById('result-container').innerHTML = `Required Sample Size: <strong>${Math.ceil(sampleSize)}</strong>`;
+
+            // Draw the OC curve with lack of confidence on Y-axis
+            drawOCCurve(Math.ceil(sampleSize), confidence);
+        }
+
+        // Function to draw OC curve using binomial distribution for 0 rejects, with conforming rate on x-axis and lack of confidence on y-axis
+        function drawOCCurve(sampleSize, confidence) {
+            const ctx = document.getElementById('ocCurveCanvas').getContext('2d');
+            const defectRates = Array.from({ length: 101 }, (_, i) => i / 100); // Defect rates from 0 to 1
+            const conformingRates = defectRates.map(p => 1 - p); // Conforming rates (1 - defect rates)
+            const probabilities = conformingRates.map(p => {
+                // Apply the binomial distribution to calculate the probability of acceptance for 0 rejects
+                return (1 - p) ** sampleSize; // Probability of accepting a lot with 0 rejects
+            });
+
+            // The lack of confidence is the complement of the calculated probability of acceptance
+            const lackOfConfidence = probabilities.map(p => (1 - p)*100); // Lack of confidence = (1 - Probability of Acceptance)
+
+            const data = {
+                labels: conformingRates.map(x => x.toFixed(2)), // Format x-axis values to 2 decimals (conforming rate)
+                datasets: [{
+                    label: 'Confidence & Reliability Plot',
+                    borderColor: '#007bff',
+                    borderWidth: 2,
+                    fill: false,
+                    data: lackOfConfidence.map(y => y.toFixed(2)), // Lack of confidence values
+                }]
+            };
+
+            const config = {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    scales: {
+x: {
+    //type: 'linear',
+    title: {
+        display: true,
+        text: 'Reliability',
+    },
+    min: 0,
+    max: 100,
+    ticks: {
+        precision: 0,
+        includeBounds: true,
+        maxTicksLimit: 21,
+        callback: function(value) {
+            return value + '%';
+        },
+        stepSize: 5,
+    },
+    grid: {
+        drawBorder: true,
+        drawOnChartArea: true,
+        drawTicks: true,
+        tickLength: 10,
+        color: 'rgba(0, 0, 0, 0.1)',
+    }
+}
+
+
+
+
+
+
+
+
+
+,
+
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Confidence', // Label for Y-axis
+                            },
+                            min: 0,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toFixed(0) + '%'; // Format Y-axis to percentage with 2 decimal places
+                                }
+					, stepSize: 5
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Destroy any existing chart before rendering a new one
+            if (window.ocChart) {
+                window.ocChart.destroy();
+            }
+
+            // Create a new chart
+            window.ocChart = new Chart(ctx, config);
+        }
+    </script>
+
+</body>
+</html>
